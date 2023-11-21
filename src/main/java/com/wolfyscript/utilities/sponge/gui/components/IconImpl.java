@@ -4,6 +4,7 @@ import com.wolfyscript.utilities.common.WolfyUtils;
 import com.wolfyscript.utilities.common.gui.*;
 import com.wolfyscript.utilities.common.gui.components.Icon;
 import com.wolfyscript.utilities.common.gui.impl.AbstractComponentImpl;
+import com.wolfyscript.utilities.sponge.gui.GuiViewManagerImpl;
 import com.wolfyscript.utilities.sponge.world.items.SpongeItemStackConfig;
 import it.unimi.dsi.fastutil.ints.IntList;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -18,13 +19,16 @@ public class IconImpl extends AbstractComponentImpl implements Icon<ItemStack> {
     }
 
     @Override
-    public Renderer getRenderer() {
-        return null;
+    public Component construct(GuiHolder guiHolder, GuiViewManager guiViewManager) {
+        return this;
     }
 
     @Override
-    public Renderer construct(GuiViewManager guiViewManager) {
-        return null;
+    public void remove(GuiHolder guiHolder, GuiViewManager guiViewManager, RenderContext renderContext) {
+        for (int slot : getSlots()) {
+            renderContext.setNativeStack(slot, null);
+            ((GuiViewManagerImpl) guiHolder.getViewManager()).updateLeaveNodes(null, slot);
+        }
     }
 
     @Override

@@ -6,7 +6,6 @@ import com.wolfyscript.utilities.common.gui.Router;
 import com.wolfyscript.utilities.common.gui.Window;
 import com.wolfyscript.utilities.common.items.ItemStackConfig;
 import com.wolfyscript.utilities.sponge.world.items.SpongeItemStackConfig;
-import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.menu.InventoryMenu;
 

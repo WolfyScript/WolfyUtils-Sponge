@@ -11,8 +11,8 @@ import com.google.inject.Stage;
 import com.wolfyscript.utilities.KeyedStaticId;
 import com.wolfyscript.utilities.NamespacedKey;
 import com.wolfyscript.utilities.common.WolfyUtils;
-import com.wolfyscript.utilities.common.gui.WindowRenderer;
 import com.wolfyscript.utilities.common.gui.*;
+import com.wolfyscript.utilities.common.gui.callback.InteractionCallback;
 import com.wolfyscript.utilities.common.gui.functions.SerializableConsumer;
 import com.wolfyscript.utilities.common.registry.RegistryGUIComponentBuilders;
 import com.wolfyscript.utilities.json.annotations.KeyedBaseType;
@@ -32,7 +32,7 @@ public class WindowBuilderImpl implements WindowBuilder {
     protected WindowType type;
     private String staticTitle = null;
     private InteractionCallback interactionCallback = (guiHolder, interactionDetails) -> InteractionResult.def();
-    private Consumer<com.wolfyscript.utilities.common.gui.WindowRenderer.Builder> rendererConstructor = builder -> {};
+    private Consumer<WindowDynamicConstructor> rendererConstructor = builder -> {};
     private final Multimap<ComponentBuilder<?, ?>, Integer> componentBuilderPositions = ArrayListMultimap.create();
     private final Set<ComponentBuilder<?, ?>> componentRenderSet = new HashSet<>();
 
@@ -49,6 +49,7 @@ public class WindowBuilderImpl implements WindowBuilder {
         this.size = size;
     }
 
+    @JsonSetter("inventory_type")
     @Override
     public WindowBuilder size(int size) {
         this.size = size;
@@ -93,7 +94,7 @@ public class WindowBuilderImpl implements WindowBuilder {
     }
 
     @Override
-    public WindowBuilder construct(Consumer<WindowRenderer.Builder> render) {
+    public WindowBuilder construct(Consumer<WindowDynamicConstructor> render) {
         Preconditions.checkNotNull(render);
         this.rendererConstructor = render;
         return this;

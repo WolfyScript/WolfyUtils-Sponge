@@ -5,11 +5,10 @@ import org.spongepowered.plugin.metadata.model.PluginDependency
 plugins {
     `java-library`
     id("org.spongepowered.gradle.plugin") version "2.1.1"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 val serverDir: String by project
-
 group = "com.wolfyscript.wolfyutils.sponge"
 version = "0.1-SNAPSHOT"
 
@@ -21,9 +20,10 @@ repositories {
 
 dependencies {
     implementation("com.wolfyscript.wolfyutils", "wolfyutilities","5.0-SNAPSHOT")
-    implementation("com.fasterxml.jackson.core", "jackson-databind","2.13.2.2")
+    implementation("com.fasterxml.jackson.core", "jackson-databind","2.15.3")
     implementation("org.reflections", "reflections", "0.10.2")
-    implementation("it.unimi.dsi", "fastutil", "8.5.6")
+    implementation("it.unimi.dsi:fastutil:8.5.6")
+    implementation("org.jetbrains:annotations:24.0.0")
 }
 
 sponge {

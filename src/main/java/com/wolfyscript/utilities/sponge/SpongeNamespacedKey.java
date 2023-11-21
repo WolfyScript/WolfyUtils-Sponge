@@ -8,13 +8,14 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.google.common.base.Preconditions;
 import com.wolfyscript.utilities.NamespacedKey;
 import com.wolfyscript.utilities.common.WolfyUtils;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Pattern;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class SpongeNamespacedKey implements NamespacedKey, Comparable<SpongeNamespacedKey> {
 
@@ -46,7 +47,7 @@ public class SpongeNamespacedKey implements NamespacedKey, Comparable<SpongeName
     /**
      * Creates a new NamespacedKey with the plugins' (lowercase) name.
      *
-     * @param plugin The plugin that this data belongs to
+     * @param api    The plugin that this data belongs to
      * @param key    The key that fits the pattern [a-z0-9/._-]
      */
     public SpongeNamespacedKey(@NotNull WolfyUtils api, @NotNull String key) {

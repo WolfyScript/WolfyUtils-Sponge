@@ -4,10 +4,10 @@ import com.wolfyscript.utilities.common.WolfyCore;
 import com.wolfyscript.utilities.common.adapters.ItemStack;
 import com.wolfyscript.utilities.common.gui.GuiAPIManager;
 import com.wolfyscript.utilities.common.gui.InteractionResult;
-import com.wolfyscript.utilities.common.gui.Signal;
 import com.wolfyscript.utilities.common.gui.components.ButtonBuilder;
 import com.wolfyscript.utilities.common.gui.components.ComponentClusterBuilder;
 import com.wolfyscript.utilities.common.gui.components.StackInputSlotBuilder;
+import com.wolfyscript.utilities.common.gui.signal.Signal;
 import com.wolfyscript.utilities.eval.value_provider.ValueProviderStringConst;
 import com.wolfyscript.utilities.sponge.world.items.SpongeItemStackConfig;
 
@@ -26,7 +26,7 @@ public class TestGUI {
                         .size(27)
                         // Creates the signal this component will track and children can listen to
                         .construct(rendering -> {
-                            Signal<Integer> count = rendering.createSignal("count", Integer.class, () -> 0);
+                            Signal<Integer> count = rendering.signal("count", Integer.class, () -> 0);
 
                             rendering
                                     // The state of a component is only reconstructed if the slot it is positioned at changes.
@@ -59,30 +59,33 @@ public class TestGUI {
                                     .reactive(reactiveBuilder -> {
                                         if (count.get() > 0) {
                                             // These components may be cleared when count == 0, so the state is recreated whenever the count changes from 0 to >0.
-                                            reactiveBuilder
-                                                    .renderAt(22, "count_down", ButtonBuilder.class, buttonBuilder -> buttonBuilder
-                                                            .icon(icon -> icon
-                                                                    .stack(() -> {
-                                                                        SpongeItemStackConfig config = new SpongeItemStackConfig(core.getWolfyUtils(), "minecraft:red_concrete");
-                                                                        config.setName(new ValueProviderStringConst(core.getWolfyUtils(), "<red><b>Count Down"));
+                                            return reactiveBuilder
+                                                    .render("ff", ComponentClusterBuilder.class, builder1 -> builder1
+                                                            .renderAt(22, "count_down", ButtonBuilder.class, buttonBuilder -> buttonBuilder
+                                                                    .icon(icon -> icon
+                                                                            .stack(() -> {
+                                                                                SpongeItemStackConfig config = new SpongeItemStackConfig(core.getWolfyUtils(), "minecraft:red_concrete");
+                                                                                config.setName(new ValueProviderStringConst(core.getWolfyUtils(), "<red><b>Count Down"));
+                                                                                return config;
+                                                                            })
+                                                                    )
+                                                                    .interact((guiHolder, interactionDetails) -> {
+                                                                        count.update(integer -> --integer);
+                                                                        return InteractionResult.cancel(true);
+                                                                    }))
+                                                            .renderAt(10, "reset", ButtonBuilder.class, buttonBuilder -> buttonBuilder
+                                                                    .icon(icon -> icon.stack(() -> {
+                                                                        SpongeItemStackConfig config = new SpongeItemStackConfig(core.getWolfyUtils(), "minecraft:tnt");
+                                                                        config.setName(new ValueProviderStringConst(core.getWolfyUtils(), "<b><red>Reset Clicks!"));
                                                                         return config;
-                                                                    })
-                                                            )
-                                                            .interact((guiHolder, interactionDetails) -> {
-                                                                count.update(integer -> --integer);
-                                                                return InteractionResult.cancel(true);
-                                                            }))
-                                                    .renderAt(10, "reset", ButtonBuilder.class, buttonBuilder -> buttonBuilder
-                                                            .icon(icon -> icon.stack(() -> {
-                                                                SpongeItemStackConfig config = new SpongeItemStackConfig(core.getWolfyUtils(), "minecraft:tnt");
-                                                                config.setName(new ValueProviderStringConst(core.getWolfyUtils(), "<b><red>Reset Clicks!"));
-                                                                return config;
-                                                            }))
-                                                            .interact((guiHolder, interactionDetails) -> {
-                                                                count.set(0); // The set method changes the value of the signal and prompts the listener of the signal to re-render.
-                                                                return InteractionResult.cancel(true);
-                                                            }));
+                                                                    }))
+                                                                    .interact((guiHolder, interactionDetails) -> {
+                                                                        count.set(0); // The set method changes the value of the signal and prompts the listener of the signal to re-render.
+                                                                        return InteractionResult.cancel(true);
+                                                                    }))
+                                                    );
                                         }
+                                        return null;
                                     });
                         })
                 )
@@ -101,7 +104,7 @@ public class TestGUI {
                         .size(9 * 3)
                         .construct((renderer) -> {
                             // This is only called upon creation of the component. So this is not called when the signal is updated!
-                            Signal<Integer> count = renderer.createSignal("count", Integer.class, () -> 0);
+                            Signal<Integer> count = renderer.signal("count", Integer.class, () -> 0);
 
                             renderer
                                     .titleSignals(count)
@@ -109,17 +112,20 @@ public class TestGUI {
                                     .reactive(reactiveBuilder -> {
                                         if (count.get() > 0) {
                                             reactiveBuilder
-                                                    .render("count_down", ButtonBuilder.class, buttonBuilder -> buttonBuilder
-                                                            .interact((guiHolder, interactionDetails) -> {
-                                                                count.update(old -> --old);
-                                                                return InteractionResult.cancel(true);
-                                                            }))
-                                                    .render("reset", ButtonBuilder.class, buttonBuilder -> buttonBuilder
-                                                            .interact((guiHolder, interactionDetails) -> {
-                                                                count.set(0); // The set method changes the value of the signal and prompts the listener of the signal to re-render.
-                                                                return InteractionResult.cancel(true);
-                                                            }));
+                                                    .render("test", ComponentClusterBuilder.class, builder1 -> builder1
+                                                            .render("count_down", ButtonBuilder.class, buttonBuilder -> buttonBuilder
+                                                                    .interact((guiHolder, interactionDetails) -> {
+                                                                        count.update(old -> --old);
+                                                                        return InteractionResult.cancel(true);
+                                                                    }))
+                                                            .render("reset", ButtonBuilder.class, buttonBuilder -> buttonBuilder
+                                                                    .interact((guiHolder, interactionDetails) -> {
+                                                                        count.set(0); // The set method changes the value of the signal and prompts the listener of the signal to re-render.
+                                                                        return InteractionResult.cancel(true);
+                                                                    }))
+                                                    );
                                         }
+                                        return null;
                                     })
                                     // The state of a component is only reconstructed if the slot it is positioned at changes.
                                     // Here the slot will always have the same type of component, so the state is created only once.
@@ -141,17 +147,17 @@ public class TestGUI {
                         .size(9 * 6)
                         .construct((renderer) -> {
                             // This is only called upon creation of the state. So this is not called when the signal is updated!
-                            Signal<ItemStack> stackToEdit = renderer.createSignal("stack_to_edit", ItemStack.class, () -> null);
-                            Signal<String> selectedTab = renderer.createSignal("selected_tab", String.class, () -> "");
+                            Signal<ItemStack> stackToEdit = renderer.signal("stack_to_edit", ItemStack.class, () -> null);
+                            Signal<String> selectedTab = renderer.signal("selected_tab", String.class, () -> "");
 
                             renderer
                                     .reactive(reactiveBuilder -> {
                                         // Reactive parts are called everytime the signal used inside this closure is updated.
                                         ItemStack stack = stackToEdit.get();
                                         if (stack == null || stack.getItem() == null || stack.getItem().getKey().equals("air"))
-                                            return;
+                                            return null;
 
-                                        switch (selectedTab.get()) {
+                                        return switch (selectedTab.get()) {
                                             case "display_name" ->
                                                     reactiveBuilder.render("display_name_tab", ComponentClusterBuilder.class, displayNameClusterBuilder -> displayNameClusterBuilder
                                                             .render("set_display_name", ButtonBuilder.class, buttonBuilder -> buttonBuilder
@@ -177,10 +183,8 @@ public class TestGUI {
 
                                                                         return InteractionResult.cancel(true);
                                                                     })));
-                                            default -> {
-                                                // No tab selected!
-                                            }
-                                        }
+                                            default -> null; // No tab selected!
+                                        };
                                     })
                                     // The state of a component is only reconstructed if the slot it is positioned at changes.
                                     // Here the slot will always have the same type of component, so the state is created only once.

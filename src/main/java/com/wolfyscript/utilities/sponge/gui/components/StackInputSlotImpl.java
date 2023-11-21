@@ -4,8 +4,11 @@ import com.wolfyscript.utilities.KeyedStaticId;
 import com.wolfyscript.utilities.common.WolfyUtils;
 import com.wolfyscript.utilities.common.adapters.ItemStack;
 import com.wolfyscript.utilities.common.gui.*;
+import com.wolfyscript.utilities.common.gui.callback.InteractionCallback;
 import com.wolfyscript.utilities.common.gui.components.StackInputSlot;
 import com.wolfyscript.utilities.common.gui.impl.AbstractComponentImpl;
+import com.wolfyscript.utilities.common.gui.signal.Signal;
+import com.wolfyscript.utilities.sponge.gui.GuiViewManagerImpl;
 import it.unimi.dsi.fastutil.ints.IntList;
 
 import java.util.Set;
@@ -35,13 +38,16 @@ public class StackInputSlotImpl extends AbstractComponentImpl implements Interac
     }
 
     @Override
-    public Renderer getRenderer() {
-        return new StackInputSlotRenderer(this);
+    public Component construct(GuiHolder guiHolder, GuiViewManager guiViewManager) {
+        return this;
     }
 
     @Override
-    public Renderer construct(GuiViewManager guiViewManager) {
-        return new StackInputSlotRenderer(this);
+    public void remove(GuiHolder guiHolder, GuiViewManager guiViewManager, RenderContext renderContext) {
+        for (int slot : getSlots()) {
+            renderContext.setNativeStack(slot, null);
+            ((GuiViewManagerImpl) guiHolder.getViewManager()).updateLeaveNodes(null, slot);
+        }
     }
 
     @Override
@@ -75,6 +81,9 @@ public class StackInputSlotImpl extends AbstractComponentImpl implements Interac
 
     @Override
     public void update(GuiViewManager viewManager, GuiHolder guiHolder, RenderContext renderContext) {
-
+        for (int slot : getSlots()) {
+            renderContext.setStack(slot, value.get().snapshot());
+            ((GuiViewManagerImpl) guiHolder.getViewManager()).updateLeaveNodes(this, slot);
+        }
     }
 }

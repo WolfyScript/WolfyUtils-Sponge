@@ -2,6 +2,8 @@ package com.wolfyscript.utilities.sponge.gui;
 
 import com.wolfyscript.utilities.common.WolfyUtils;
 import com.wolfyscript.utilities.common.gui.*;
+import com.wolfyscript.utilities.common.gui.callback.TextInputCallback;
+import com.wolfyscript.utilities.common.gui.callback.TextInputTabCompleteCallback;
 import com.wolfyscript.utilities.common.gui.impl.AbstractComponentImpl;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
@@ -52,6 +54,26 @@ public class GuiViewManagerImpl extends GuiViewManagerCommonImpl {
     }
 
     @Override
+    public Optional<TextInputCallback> textInputCallback() {
+        return Optional.empty();
+    }
+
+    @Override
+    public void setTextInputCallback(TextInputCallback textInputCallback) {
+
+    }
+
+    @Override
+    public Optional<TextInputTabCompleteCallback> textInputTabCompleteCallback() {
+        return Optional.empty();
+    }
+
+    @Override
+    public void setTextInputTabCompleteCallback(TextInputTabCompleteCallback textInputTabCompleteCallback) {
+
+    }
+
+    @Override
     public void openNew(String... path) {
         Window window = getRouter().open(this, path);
         setCurrentRoot(window);
@@ -63,11 +85,14 @@ public class GuiViewManagerImpl extends GuiViewManagerCommonImpl {
         }
     }
 
-    void renderFor(ServerPlayer player, RenderContextImpl context) {
+    public void renderFor(ServerPlayer player, RenderContextImpl context) {
         if (!Objects.equals(player.openInventory().flatMap(Container::currentMenu).orElse(null), context.getInventory())) {
             viewerContexts.put(player.uniqueId(), context);
             context.getInventory().open(player);
-            getCurrentMenu().ifPresent(window -> window.construct(this).render(((CarriedInventory<GUIHolder>) context.getInventory().inventory()).carrier().orElse(null), context));
+            getCurrentMenu().ifPresent(window -> {
+                GuiHolder guiHolder = ((CarriedInventory<GUIHolder>) context.getInventory().inventory()).carrier().orElse(null);
+                window.construct(guiHolder, this).render(guiHolder, this, context);
+            });
         }
         GUIHolder holder = ((CarriedInventory<GUIHolder>) context.getInventory().inventory()).carrier().orElse(null);
         for (SignalledObject signalledObject : updatedSignalsSinceLastUpdate) {

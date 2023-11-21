@@ -23,6 +23,7 @@ import com.wolfyscript.utilities.json.jackson.JacksonUtil;
 import com.wolfyscript.utilities.sponge.gui.WindowImpl;
 import com.wolfyscript.utilities.sponge.gui.components.*;
 import com.wolfyscript.utilities.sponge.gui.example.TestGUI;
+import com.wolfyscript.utilities.sponge.gui.listeners.GUIListeners;
 import com.wolfyscript.utilities.sponge.registry.SpongeRegistries;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
@@ -35,6 +36,7 @@ import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.reflections.util.ConfigurationBuilder;
 import org.spongepowered.api.Server;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.parameter.Parameter;
@@ -43,6 +45,7 @@ import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.EventContext;
 import org.spongepowered.api.event.EventContextKeys;
+import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
 import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
@@ -93,6 +96,9 @@ public class WolfyCoreSponge implements WolfyCore {
         this.wolfyUtils = getOrCreate(container, configDir);
         this.reflections = initReflections();
         this.registries = new SpongeRegistries(this);
+
+        EventManager eventManager = Sponge.eventManager();
+        eventManager.registerListeners(container, new GUIListeners(container));
 
         // De-/Serializer Modifiers that handle type references in JSON
         var keyReferenceModule = new SimpleModule();

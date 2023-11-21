@@ -24,6 +24,11 @@ public class EntityImpl implements Entity {
     }
 
     @Override
+    public UUID uuid() {
+        return uuid;
+    }
+
+    @Override
     public @NotNull Location getLocation() {
         return null;
     }

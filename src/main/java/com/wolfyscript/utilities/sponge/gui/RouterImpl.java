@@ -24,6 +24,7 @@ import com.google.common.collect.HashBiMap;
 import com.wolfyscript.utilities.KeyedStaticId;
 import com.wolfyscript.utilities.common.WolfyUtils;
 import com.wolfyscript.utilities.common.gui.*;
+import com.wolfyscript.utilities.common.gui.callback.InteractionCallback;
 
 import java.util.Arrays;
 import java.util.Deque;

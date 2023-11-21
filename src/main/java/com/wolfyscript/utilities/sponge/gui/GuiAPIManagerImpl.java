@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public class GuiAPIManagerImpl extends GuiAPIManagerCommonImpl {
 
@@ -50,6 +51,16 @@ public class GuiAPIManagerImpl extends GuiAPIManagerCommonImpl {
     @Override
     public  GuiViewManager createView(String clusterID, UUID... uuids) {
         return getGui(clusterID).map(cluster -> new GuiViewManagerImpl(wolfyUtils, cluster, Set.of(uuids))).orElse(null);
+    }
+
+    @Override
+    public Stream<GuiViewManager> getViewManagersFor(UUID uuid) {
+        return null;
+    }
+
+    @Override
+    public Stream<GuiViewManager> getViewManagersFor(UUID uuid, String s) {
+        return null;
     }
 
     @Override

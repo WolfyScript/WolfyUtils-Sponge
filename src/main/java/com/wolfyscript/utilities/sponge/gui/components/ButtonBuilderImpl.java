@@ -6,26 +6,32 @@ import com.google.inject.Inject;
 import com.wolfyscript.utilities.KeyedStaticId;
 import com.wolfyscript.utilities.common.WolfyUtils;
 import com.wolfyscript.utilities.common.gui.*;
+import com.wolfyscript.utilities.common.gui.callback.InteractionCallback;
 import com.wolfyscript.utilities.common.gui.components.Button;
 import com.wolfyscript.utilities.common.gui.components.ButtonBuilder;
 import com.wolfyscript.utilities.common.gui.components.ButtonIcon;
 import com.wolfyscript.utilities.common.gui.functions.SerializableSupplier;
 import com.wolfyscript.utilities.common.gui.impl.AbstractComponentBuilderImpl;
+import com.wolfyscript.utilities.common.gui.signal.Signal;
 import com.wolfyscript.utilities.common.items.ItemStackConfig;
 import com.wolfyscript.utilities.sponge.gui.SignalImpl;
 import com.wolfyscript.utilities.sponge.world.items.SpongeItemStackConfig;
 import it.unimi.dsi.fastutil.ints.IntList;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 @KeyedStaticId(key = "button")
 @ComponentBuilderSettings(base = ButtonBuilder.class, component = Button.class)
 public class ButtonBuilderImpl extends AbstractComponentBuilderImpl<Button, Component> implements ButtonBuilder {
 
     private InteractionCallback interactionCallback = (guiHolder, interactionDetails) -> InteractionResult.cancel(true);
+    private Function<GuiHolder, Optional<Sound>> soundFunction = holder -> Optional.of(Sound.sound(Key.key("minecraft:ui.button.click"), Sound.Source.MASTER, 0.25f, 1));;
     private final IconBuilderImpl iconBuilder;
 
     /**
@@ -60,10 +66,17 @@ public class ButtonBuilderImpl extends AbstractComponentBuilderImpl<Button, Comp
     }
 
     @Override
+    public ButtonBuilder sound(Function<GuiHolder, Optional<Sound>> soundFunction) {
+        Preconditions.checkArgument(soundFunction != null, "Sound function must be non-null!");
+        this.soundFunction = soundFunction;
+        return this;
+    }
+
+    @Override
     public Button create(Component parent) {
-        ButtonImpl button = new ButtonImpl(getWolfyUtils(), getID(), parent, iconBuilder.create(), interactionCallback, getSlots());
+        ButtonImpl button = new ButtonImpl(getWolfyUtils(), getID(), parent, iconBuilder.create(), soundFunction, interactionCallback, getSlots());
         for (Signal<?> signal : iconBuilder.signals) {
-            ((SignalImpl<?>) signal).linkTo(button);
+            signal.linkTo(button);
         }
         return button;
     }
