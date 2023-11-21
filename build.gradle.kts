@@ -10,7 +10,7 @@ plugins {
 
 val serverDir: String by project
 group = "com.wolfyscript.wolfyutils.sponge"
-version = "0.1-SNAPSHOT"
+version = "5.0-alpha.1-SNAPSHOT"
 
 repositories {
     mavenCentral();
