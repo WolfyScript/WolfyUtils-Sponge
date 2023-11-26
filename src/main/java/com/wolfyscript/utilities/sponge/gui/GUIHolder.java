@@ -1,14 +1,10 @@
 package com.wolfyscript.utilities.sponge.gui;
 
 import com.wolfyscript.utilities.common.gui.*;
-import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.menu.InventoryMenu;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
-
-import java.util.SplittableRandom;
 
 public class GUIHolder extends GuiHolderCommonImpl implements Carrier {
 

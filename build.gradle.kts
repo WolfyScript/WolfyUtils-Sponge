@@ -1,11 +1,15 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.wolfyscript.devtools.docker.minecraft.MinecraftServersExtension
 import org.spongepowered.gradle.plugin.config.PluginLoaders
 import org.spongepowered.plugin.metadata.model.PluginDependency
+import java.io.FileOutputStream
 
 plugins {
     `java-library`
     id("org.spongepowered.gradle.plugin") version "2.1.1"
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("com.wolfyscript.devtools.docker.run") version ("2.0-SNAPSHOT")
+    id("com.wolfyscript.devtools.docker.minecraft_servers") version ("2.0-SNAPSHOT")
 }
 
 val serverDir: String by project
@@ -27,7 +31,7 @@ dependencies {
 }
 
 sponge {
-    apiVersion("8.1.0")
+    apiVersion("8.2.0")
     license("GNU GPL 3.0")
     loader {
         name(PluginLoaders.JAVA_PLAIN)
@@ -49,7 +53,7 @@ sponge {
     }
 }
 
-val javaTarget = 16 // Sponge targets a minimum of Java 8
+val javaTarget = 17 // Sponge targets a minimum of Java 8
 java {
     sourceCompatibility = JavaVersion.toVersion(javaTarget)
     targetCompatibility = JavaVersion.toVersion(javaTarget)
@@ -59,9 +63,8 @@ java {
 }
 
 tasks.withType(ShadowJar::class) {
-    archiveBaseName.set("wolfyutils-sponge")
     archiveClassifier.set("")
-    archiveVersion.set("")
+    //archiveVersion.set("")
     relocate("com.fasterxml", "com.wolfyscript.lib.com.fasterxml")
     relocate("org.reflections", "com.wolfyscript.lib.org.reflections")
     relocate("javassist", "com.wolfyscript.lib.javassist")
@@ -86,8 +89,28 @@ tasks.withType(AbstractArchiveTask::class).configureEach {
     isPreserveFileTimestamps = false
 }
 
-tasks.register<Copy>("copyJar") {
-    println("Copy Jar to server: $serverDir/plugins")
-    from(layout.buildDirectory.dir("libs/wolfyutils-sponge.jar"))
-    into("$serverDir/plugins")
+val debugPort: String = "5007"
+
+minecraftDockerRun {
+    val customEnv = env.get().toMutableMap()
+    customEnv["MEMORY"] = "2G"
+    customEnv["JVM_OPTS"] = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${debugPort}"
+    env.set(customEnv)
+    arguments("--cpus", "2", "-it") // Constrain to only use 2 cpus, and allow for console interactivity with 'docker attach'
+}
+
+minecraftServers {
+    val directory = file("${System.getProperty("user.home")}${File.separator}minecraft${File.separator}test_servers_v5");
+    serversDir.set(directory)
+    libName.set("${project.name}-${version}.jar")
+    val debugPortMapping = "${debugPort}:${debugPort}"
+    servers {
+        register("spongevanilla_1_16") {
+            val spongeVersion = "1.16.5-8.2.0"
+            type.set("CUSTOM")
+            extraEnv.put("SPONGEVERSION", spongeVersion)
+            extraEnv.put("CUSTOM_SERVER", "https://repo.spongepowered.org/repository/maven-public/org/spongepowered/spongevanilla/${spongeVersion}/spongevanilla-${spongeVersion}-universal.jar")
+            ports.set(setOf(debugPortMapping, "25595:25565"))
+        }
+    }
 }
