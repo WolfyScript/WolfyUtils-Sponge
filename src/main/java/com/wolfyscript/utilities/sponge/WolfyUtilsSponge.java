@@ -1,13 +1,12 @@
 package com.wolfyscript.utilities.sponge;
 
-import com.wolfyscript.utilities.common.Identifiers;
-import com.wolfyscript.utilities.common.WolfyCore;
-import com.wolfyscript.utilities.common.WolfyUtils;
-import com.wolfyscript.utilities.common.chat.Chat;
-import com.wolfyscript.utilities.common.gui.GuiAPIManager;
-import com.wolfyscript.utilities.common.language.LanguageAPI;
+import com.wolfyscript.utilities.Identifiers;
+import com.wolfyscript.utilities.WolfyUtils;
+import com.wolfyscript.utilities.chat.Chat;
+import com.wolfyscript.utilities.gui.GuiAPIManager;
+import com.wolfyscript.utilities.gui.GuiAPIManagerImpl;
+import com.wolfyscript.utilities.language.LanguageAPI;
 import com.wolfyscript.utilities.sponge.chat.ChatImpl;
-import com.wolfyscript.utilities.sponge.gui.GuiAPIManagerImpl;
 import com.wolfyscript.utilities.sponge.language.LangAPISponge;
 
 import java.io.*;
@@ -62,7 +61,7 @@ public class WolfyUtilsSponge extends WolfyUtils {
 
     @Override
     public java.util.logging.Logger getLogger() {
-        return null;
+        return java.util.logging.Logger.getLogger("WolfUtils");
     }
 
     @Override
@@ -86,8 +85,55 @@ public class WolfyUtilsSponge extends WolfyUtils {
     }
 
     @Override
-    public void exportResource(String s, File file, boolean b) {
+    public void exportResource(String resourcePath, File destination, boolean replace) {
+        if (resourcePath == null || resourcePath.isEmpty()) {
+            throw new IllegalArgumentException("ResourcePath cannot be null or empty");
+        }
+        getLogger().info("export resource: " + resourcePath);
 
+        resourcePath = resourcePath.replace('\\', '/');
+        URL url = pluginContainer.instance().getClass().getClassLoader().getResource(resourcePath);
+        if (url == null) return;
+
+        try {
+            URLConnection connection = url.openConnection();
+            connection.setUseCaches(false);
+            InputStream in = connection.getInputStream();
+
+            if (in == null) {
+                throw new IllegalArgumentException("The embedded resource '" + resourcePath + "' cannot be found in " + getName());
+            }
+
+            final File outDir;
+            if (destination.isDirectory()) {
+                // Destination is a directory, so keep file name
+                outDir = destination;
+                destination = new File(destination, resourcePath.substring(resourcePath.lastIndexOf('/') + 1));
+            } else {
+                outDir = new File(destination.getPath().substring(0, Math.max(destination.getPath().lastIndexOf('/'), 0)));
+            }
+
+            if (!outDir.exists()) {
+                outDir.mkdirs();
+            }
+
+            try {
+                if (!destination.exists() || replace) {
+                    OutputStream out = new FileOutputStream(destination);
+                    byte[] buf = new byte[1024];
+                    int len;
+                    while ((len = in.read(buf)) > 0) {
+                        out.write(buf, 0, len);
+                    }
+                    out.close();
+                    in.close();
+                }
+            } catch (IOException ex) {
+                getLogger().log(Level.SEVERE, "Could not save " + destination.getName() + " to " + destination, ex);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -96,6 +142,7 @@ public class WolfyUtilsSponge extends WolfyUtils {
             dir.mkdirs();
         }
         resourceName = resourceName.replace('\\', '/');
+        getLogger().info("export resources: " + resourceName);
 
         Set<String> paths = getCore().getReflections().getResources(filePattern);
         for (String path : paths) {

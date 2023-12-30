@@ -7,10 +7,11 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.google.common.base.Preconditions;
 import com.wolfyscript.utilities.NamespacedKey;
-import com.wolfyscript.utilities.common.WolfyUtils;
+import com.wolfyscript.utilities.WolfyUtils;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.api.ResourceKey;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -105,6 +106,10 @@ public class SpongeNamespacedKey implements NamespacedKey, Comparable<SpongeName
         } else {
             return wolfyutilties(parts[0]);
         }
+    }
+
+    public static SpongeNamespacedKey of(ResourceKey key) {
+        return new SpongeNamespacedKey(key.namespace(), key.value());
     }
 
     public static SpongeNamespacedKey wolfyutilties(String key) {

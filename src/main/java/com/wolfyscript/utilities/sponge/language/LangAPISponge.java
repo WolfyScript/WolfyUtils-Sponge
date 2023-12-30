@@ -1,6 +1,6 @@
 package com.wolfyscript.utilities.sponge.language;
 
-import com.wolfyscript.utilities.common.language.LanguageAPI;
+import com.wolfyscript.utilities.language.LanguageAPI;
 import com.wolfyscript.utilities.language.Language;
 import com.wolfyscript.utilities.sponge.WolfyUtilsSponge;
 import org.jetbrains.annotations.NotNull;

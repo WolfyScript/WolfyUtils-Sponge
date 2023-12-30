@@ -1,9 +1,9 @@
 package com.wolfyscript.utilities.sponge.chat;
 
-import com.wolfyscript.utilities.common.WolfyUtils;
-import com.wolfyscript.utilities.common.adapters.Player;
-import com.wolfyscript.utilities.common.chat.Chat;
-import com.wolfyscript.utilities.common.chat.ClickActionCallback;
+import com.wolfyscript.utilities.WolfyUtils;
+import com.wolfyscript.utilities.platform.adapters.Player;
+import com.wolfyscript.utilities.chat.Chat;
+import com.wolfyscript.utilities.chat.ClickActionCallback;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;

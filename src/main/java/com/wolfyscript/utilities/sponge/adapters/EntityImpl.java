@@ -1,9 +1,9 @@
 package com.wolfyscript.utilities.sponge.adapters;
 
-import com.wolfyscript.utilities.common.adapters.Entity;
-import com.wolfyscript.utilities.common.adapters.Location;
-import com.wolfyscript.utilities.common.adapters.Vector3D;
-import com.wolfyscript.utilities.common.adapters.World;
+import com.wolfyscript.utilities.platform.adapters.Entity;
+import com.wolfyscript.utilities.platform.adapters.Location;
+import com.wolfyscript.utilities.platform.adapters.Vector3D;
+import com.wolfyscript.utilities.platform.adapters.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.Sponge;
@@ -11,11 +11,12 @@ import org.spongepowered.api.Sponge;
 import java.util.Optional;
 import java.util.UUID;
 
-public class EntityImpl implements Entity {
+public class EntityImpl<T extends org.spongepowered.api.entity.Entity> extends SpongeRefAdapter<T> implements Entity {
 
     private final UUID uuid;
 
-    public EntityImpl(org.spongepowered.api.entity.Entity spongeEntity) {
+    public EntityImpl(T spongeEntity) {
+        super(spongeEntity);
         this.uuid = spongeEntity.uniqueId();
     }
 

@@ -3,8 +3,9 @@ package com.wolfyscript.utilities.sponge.world.items;
 import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.wolfyscript.utilities.common.WolfyUtils;
-import com.wolfyscript.utilities.common.items.ItemStackConfig;
+import com.wolfyscript.utilities.WolfyUtils;
+import com.wolfyscript.utilities.sponge.adapters.ItemStackImpl;
+import com.wolfyscript.utilities.world.items.ItemStackConfig;
 import com.wolfyscript.utilities.eval.context.EvalContext;
 import com.wolfyscript.utilities.eval.operator.BoolOperatorConst;
 import com.wolfyscript.utilities.eval.value_provider.*;
@@ -12,6 +13,7 @@ import com.wolfyscript.utilities.nbt.*;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.data.DataManipulator;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
@@ -23,7 +25,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class SpongeItemStackConfig extends ItemStackConfig<ItemStack> {
+public class SpongeItemStackConfig extends ItemStackConfig {
 
     private final Set<String> HANDLED_NBT_TAGS = Set.of("display.Name", "display.Lore", "CustomModelData", "Damage", "Enchantments");
 
@@ -57,26 +59,28 @@ public class SpongeItemStackConfig extends ItemStackConfig<ItemStack> {
     }
 
     @Override
-    public ItemStack constructItemStack() {
+    public ItemStackImpl constructItemStack() {
         return constructItemStack(new EvalContext());
     }
 
     @Override
-    public ItemStack constructItemStack(EvalContext context) {
+    public ItemStackImpl constructItemStack(EvalContext context) {
         return constructItemStack(context, wolfyUtils.getChat().getMiniMessage(), TagResolver.empty());
     }
 
-    public ItemStack constructItemStack(EvalContext context, MiniMessage miniMsg, TagResolver... tagResolvers) {
-        return ItemTypes.registry().findValue(ResourceKey.resolve(itemId)).map(itemType -> {
+    @Override
+    public ItemStackImpl constructItemStack(EvalContext context, MiniMessage miniMsg, TagResolver tagResolvers) {
+        return new ItemStackImpl(wolfyUtils, ItemTypes.registry().findValue(ResourceKey.resolve(itemId)).map(itemType -> {
             ItemStack.Builder builder = ItemStack.builder()
                     .itemType(itemType)
                     .quantity(amount.getValue(context));
 
             // TODO: Apply NBT
 
+            String nameVal = name == null ? null : name.getValue(context);
             // Apply handled settings
-            if (name != null) {
-                builder.add(Keys.DISPLAY_NAME, miniMsg.deserialize(name.getValue(context), tagResolvers));
+            if (nameVal != null) {
+                builder.add(Keys.CUSTOM_NAME, miniMsg.deserialize(nameVal, tagResolvers));
             }
             if (lore != null && !lore.isEmpty()) {
                 builder.add(Keys.LORE, lore.stream().map(line -> miniMsg.deserialize(line.getValue(context), tagResolvers)).toList());
@@ -97,7 +101,7 @@ public class SpongeItemStackConfig extends ItemStackConfig<ItemStack> {
             }
 
             return builder.build();
-        }).orElse(null);
+        }).orElse(null));
     }
 
     private NBTTagConfigCompound readFromItemStack(DataContainer currentCompound, String path, NBTTagConfig parent) {

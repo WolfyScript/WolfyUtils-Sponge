@@ -1,10 +1,10 @@
 package com.wolfyscript.utilities.sponge.registry;
 
-import com.wolfyscript.utilities.common.WolfyCore;
-import com.wolfyscript.utilities.common.gui.Component;
-import com.wolfyscript.utilities.common.registry.Registries;
-import com.wolfyscript.utilities.common.registry.RegistryGUIComponentBuilders;
-import com.wolfyscript.utilities.common.registry.TypeRegistry;
+import com.wolfyscript.utilities.WolfyCore;
+import com.wolfyscript.utilities.gui.Component;
+import com.wolfyscript.utilities.registry.Registries;
+import com.wolfyscript.utilities.registry.RegistryGUIComponentBuilders;
+import com.wolfyscript.utilities.registry.TypeRegistry;
 import com.wolfyscript.utilities.sponge.SpongeNamespacedKey;
 import org.jetbrains.annotations.NotNull;
 

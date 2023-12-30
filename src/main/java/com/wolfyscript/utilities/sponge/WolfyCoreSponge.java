@@ -8,23 +8,20 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Stage;
 import com.wolfyscript.jackson.dataformat.hocon.HoconMapper;
-import com.wolfyscript.utilities.Platform;
-import com.wolfyscript.utilities.common.WolfyCore;
-import com.wolfyscript.utilities.common.WolfyUtils;
-import com.wolfyscript.utilities.common.chat.Chat;
-import com.wolfyscript.utilities.common.gui.ComponentBuilder;
-import com.wolfyscript.utilities.common.registry.Registries;
+import com.wolfyscript.utilities.WolfyCore;
+import com.wolfyscript.utilities.WolfyUtils;
+import com.wolfyscript.utilities.chat.Chat;
+import com.wolfyscript.utilities.config.jackson.*;
+import com.wolfyscript.utilities.gui.ComponentBuilder;
+import com.wolfyscript.utilities.gui.components.*;
+import com.wolfyscript.utilities.gui.example.CounterExample;
+import com.wolfyscript.utilities.platform.Platform;
+import com.wolfyscript.utilities.registry.Registries;
 import com.wolfyscript.utilities.eval.value_provider.*;
-import com.wolfyscript.utilities.json.KeyedTypeIdResolver;
-import com.wolfyscript.utilities.json.annotations.OptionalKeyReference;
-import com.wolfyscript.utilities.json.annotations.OptionalValueDeserializer;
-import com.wolfyscript.utilities.json.annotations.OptionalValueSerializer;
-import com.wolfyscript.utilities.json.jackson.JacksonUtil;
-import com.wolfyscript.utilities.sponge.gui.WindowImpl;
-import com.wolfyscript.utilities.sponge.gui.components.*;
-import com.wolfyscript.utilities.sponge.gui.example.TestGUI;
 import com.wolfyscript.utilities.sponge.gui.listeners.GUIListeners;
 import com.wolfyscript.utilities.sponge.registry.SpongeRegistries;
+import com.wolfyscript.utilities.sponge.world.items.SpongeItemStackConfig;
+import com.wolfyscript.utilities.world.items.ItemStackConfig;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.LinearComponents;
@@ -41,9 +38,7 @@ import org.spongepowered.api.command.Command;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.config.ConfigDir;
-import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.event.EventContext;
 import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.Listener;
@@ -76,12 +71,14 @@ public class WolfyCoreSponge implements WolfyCore {
     private final PluginContainer container;
     private final Logger logger;
     private final Path configDir;
+    private final Platform platform;
 
     @Inject
     WolfyCoreSponge(final PluginContainer container, final Logger logger, @ConfigDir(sharedRoot = false) final Path configDir) {
         this.container = container;
         this.configDir = configDir;
         this.logger = logger;
+        this.platform = new PlatformImpl(this);
     }
 
     @Listener
@@ -112,6 +109,11 @@ public class WolfyCoreSponge implements WolfyCore {
         valueReferenceModule.setDeserializerModifier(new OptionalValueDeserializer.DeserializerModifier());
         jsonMapperModules.add(valueReferenceModule);
         JacksonUtil.registerModule(valueReferenceModule);
+
+        var implementationModule = new SimpleModule();
+        implementationModule.addAbstractTypeMapping(ItemStackConfig.class, SpongeItemStackConfig.class);
+        jsonMapperModules.add(implementationModule);
+        JacksonUtil.registerModule(implementationModule);
 
         // Create Global WUCore Mapper and apply modules
         HoconMapper mapper = applyWolfyUtilsJsonMapperModules(new HoconMapper());
@@ -156,9 +158,7 @@ public class WolfyCoreSponge implements WolfyCore {
         this.logger.info("Instance: " + event.plugin().instance().getClass().getName());
         this.logger.info("Config PAth: " + event.game().configManager().pluginConfig(container).directory().toString());
 
-        TestGUI testGUI = new TestGUI(this);
-        testGUI.initWithConfig();
-
+        CounterExample.register(wolfyUtils.getGUIManager());
     }
 
     private Command.Parameterized buildTestGUICommand() {
@@ -218,7 +218,7 @@ public class WolfyCoreSponge implements WolfyCore {
                     });
                     return CommandResult.success();
                 })
-                .permission("wolfyutils.command.gui")
+                //.permission("wolfyutils.command.gui")
                 //.executionRequirements(cause -> cause.context().get(EventContextKeys.PLAYER).isPresent())
                 .build(), "gui_example");
 
@@ -267,8 +267,8 @@ public class WolfyCoreSponge implements WolfyCore {
     }
 
     @Override
-    public Platform getPlatform() {
-        return null;
+    public Platform platform() {
+        return platform;
     }
 
     public Logger getLogger() {

@@ -23,7 +23,8 @@ repositories {
 }
 
 dependencies {
-    implementation("com.wolfyscript.wolfyutils", "wolfyutilities","5.0-SNAPSHOT")
+    implementation("com.wolfyscript.wolfyutils", "api","5.0-alpha.1-SNAPSHOT")
+    implementation("com.wolfyscript.wolfyutils", "common","5.0-alpha.1-SNAPSHOT")
     implementation("com.fasterxml.jackson.core", "jackson-databind","2.15.3")
     implementation("org.reflections", "reflections", "0.10.2")
     implementation("it.unimi.dsi:fastutil:8.5.6")

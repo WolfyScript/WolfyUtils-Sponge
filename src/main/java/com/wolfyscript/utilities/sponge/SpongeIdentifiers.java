@@ -1,8 +1,8 @@
 package com.wolfyscript.utilities.sponge;
 
 import com.wolfyscript.utilities.NamespacedKey;
-import com.wolfyscript.utilities.common.Identifiers;
-import com.wolfyscript.utilities.common.WolfyUtils;
+import com.wolfyscript.utilities.Identifiers;
+import com.wolfyscript.utilities.WolfyUtils;
 
 public class SpongeIdentifiers implements Identifiers {
 

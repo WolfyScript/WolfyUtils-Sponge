@@ -1,9 +1,9 @@
 package com.wolfyscript.utilities.sponge.gui;
 
 import com.google.common.base.Preconditions;
-import com.wolfyscript.utilities.common.gui.ClickInteractionDetails;
-import com.wolfyscript.utilities.common.gui.ClickType;
-import com.wolfyscript.utilities.common.gui.InteractionResult;
+import com.wolfyscript.utilities.gui.ClickInteractionDetails;
+import com.wolfyscript.utilities.gui.ClickType;
+import com.wolfyscript.utilities.gui.InteractionResult;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.menu.ClickTypes;
 import org.spongepowered.api.registry.DefaultedRegistryType;
@@ -38,7 +38,7 @@ public class ClickInteractionDetailsImpl implements ClickInteractionDetails {
         clickTypeMapping.put(ClickTypes.CLICK_RIGHT_OUTSIDE.get(), ClickType.CONTAINER_BORDER_SECONDARY);
     }
 
-    ClickInteractionDetailsImpl(org.spongepowered.api.item.inventory.menu.ClickType<?> clickType, Slot slot, int slotIndex, int hotbarSlot) {
+    public ClickInteractionDetailsImpl(org.spongepowered.api.item.inventory.menu.ClickType<?> clickType, Slot slot, int slotIndex, int hotbarSlot) {
         this.clickType = clickType;
         this.slotIndex = slotIndex;
         this.hotbarSlot = hotbarSlot;
